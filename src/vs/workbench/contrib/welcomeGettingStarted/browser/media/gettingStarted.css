@@ -1154,7 +1154,7 @@
 	/* Increased from 60% */
 	max-width: 900px;
 	/* Increased from 600px */
-	margin: 12px auto;
+	margin: 20px auto;
 	/* Increased from 8px */
 	display: flex;
 	justify-content: space-between;
@@ -1368,7 +1368,6 @@
 .monaco-workbench .part.editor > .content .gettingStartedContainer.newSlide .sub-step {
 	display: flex;
 	flex-direction: column;
-	padding: 8px 12px 8px 12px;
 	cursor: pointer;
 	transition: background-color 0.1s ease;
 	border-left: 3px solid transparent;
@@ -1390,7 +1389,7 @@
 }
 
 .monaco-workbench .part.editor > .content .gettingStartedContainer.newSlide .multi-step-container .button-container {
-	margin-top: 50px;
+	margin-top: 2em;
 	margin-left: 16px
 }
 

@@ -958,13 +958,13 @@ export class GettingStartedPage extends EditorPane {
 			const fistContentBehaviour = daysSinceFirstSession < 1 ? 'openToFirstCategory' : 'index';
 
 			if (fistContentBehaviour === 'openToFirstCategory') {
-				const first = this.gettingStartedCategories.filter(c => !c.when || this.contextService.contextMatchesRules(c.when))[0];
+				const first = this.gettingStartedService.getWalkthrough('NewWelcomeExperience');
 				if (first) {
 					this.hasScrolledToFirstCategory = true;
 					this.currentWalkthrough = first;
 					this.editorInput.selectedCategory = this.currentWalkthrough?.id;
 					this.editorInput.walkthroughPageTitle = this.currentWalkthrough.walkthroughPageTitle;
-					this.buildCategorySlide(this.editorInput.selectedCategory, undefined);
+					this.buildNewCategorySlide(this.editorInput.selectedCategory, undefined);
 					this.setSlide('details', true /* firstLaunch */);
 					return;
 				}
