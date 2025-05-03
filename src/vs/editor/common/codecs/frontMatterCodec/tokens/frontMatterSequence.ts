@@ -11,7 +11,7 @@ import { type TSimpleDecoderToken } from '../../simpleCodec/simpleDecoder.js';
 /**
  * Token represents a generic sequence of tokens in a Front Matter header.
  */
-export class FrontMatterSequence extends FrontMatterValueToken<string> {
+export class FrontMatterSequence extends FrontMatterValueToken<string, readonly TSimpleDecoderToken[]> {
 	/**
 	 * @override Because this token represent a generic sequence of tokens,
 	 * the type name is represented by the text of sequence itself.
@@ -23,29 +23,9 @@ export class FrontMatterSequence extends FrontMatterValueToken<string> {
 	/**
 	 * TODO: @legomushroom
 	 */
-	public override get tokens(): readonly TSimpleDecoderToken[] {
-		return this.currentTokens;
-	}
-
-	/**
-	 * TODO: @legomushroom
-	 */
-	private readonly currentTokens: TSimpleDecoderToken[];
-
-	constructor(
-		tokens: readonly TSimpleDecoderToken[],
-	) {
-		super(BaseToken.fullRange(tokens));
-
-		this.currentTokens = [...tokens];
-	}
-
-	/**
-	 * TODO: @legomushroom
-	 */
 	// TODO: @legomushroom - trim spaces?
 	public get cleanText(): string {
-		return BaseToken.render(this.tokens);
+		return this.text;
 	}
 
 	/**
@@ -55,9 +35,9 @@ export class FrontMatterSequence extends FrontMatterValueToken<string> {
 	public trimEnd(): readonly SpacingToken[] {
 		const trimmedTokens = [];
 
-		let index = this.currentTokens.length - 1;
+		let index = this.childTokens.length - 1;
 		while (index >= 0) {
-			const token = this.currentTokens[index];
+			const token = this.childTokens[index];
 
 			if (token instanceof SpacingToken) {
 				trimmedTokens.push(token);
@@ -70,17 +50,17 @@ export class FrontMatterSequence extends FrontMatterValueToken<string> {
 		}
 
 		// TODO: @legomushroom
-		this.currentTokens.length = index + 1;
-		if (this.currentTokens.length === 0) {
+		this.childTokens.length = index + 1;
+		if (this.childTokens.length === 0) {
 			this.collapseRangeToStart();
-			this.currentTokens.push(
+			this.childTokens.push(
 				new Word(this.range, ''),
 			);
 		}
 
 		// TODO: @legomushroom
 		this.withRange(
-			BaseToken.fullRange(this.currentTokens),
+			BaseToken.fullRange(this.childTokens),
 		);
 
 		// TODO: @legomushroom

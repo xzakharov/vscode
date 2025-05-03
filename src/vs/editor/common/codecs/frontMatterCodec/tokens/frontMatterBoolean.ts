@@ -7,7 +7,6 @@ import { BaseToken } from '../../baseToken.js';
 import { Word } from '../../simpleCodec/tokens/index.js';
 import { FrontMatterValueToken } from './frontMatterToken.js';
 import { assertDefined } from '../../../../../base/common/types.js';
-import { TSimpleDecoderToken } from '../../simpleCodec/simpleDecoder.js';
 
 /**
  * Token that represents a `boolean` value in a Front Matter header.
@@ -56,6 +55,23 @@ export class FrontMatterBoolean extends FrontMatterValueToken<'boolean', readonl
 			// noop
 			return null;
 		}
+	}
+
+	/**
+	 * TODO: @legomushroom
+	 */
+	// TODO: @legomushroom - unit test
+	// TODO: @legomushroom  - cleanup all 'public override equals()' methods
+	public override equals(other: BaseToken): other is typeof this {
+		if ((super.equals(other) === false) && (this.text === other.text)) {
+			return false;
+		}
+
+		if (other instanceof FrontMatterBoolean === false) {
+			return false;
+		}
+
+		return this.value === other.value;
 	}
 
 	public override toString(): string {
