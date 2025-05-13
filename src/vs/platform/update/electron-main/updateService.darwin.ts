@@ -10,13 +10,21 @@ import { hash } from '../../../base/common/hash.js';
 import { DisposableStore } from '../../../base/common/lifecycle.js';
 import { IConfigurationService } from '../../configuration/common/configuration.js';
 import { IEnvironmentMainService } from '../../environment/electron-main/environmentMainService.js';
-import { ILifecycleMainService, IRelaunchHandler, IRelaunchOptions } from '../../lifecycle/electron-main/lifecycleMainService.js';
+import { ILifecycleMainService, IRelaunchHandler, IRelaunchOptions, LifecycleMainPhase } from '../../lifecycle/electron-main/lifecycleMainService.js';
 import { ILogService } from '../../log/common/log.js';
 import { IProductService } from '../../product/common/productService.js';
 import { IRequestService } from '../../request/common/request.js';
 import { ITelemetryService } from '../../telemetry/common/telemetry.js';
 import { IUpdate, State, StateType, UpdateType } from '../common/update.js';
 import { AbstractUpdateService, createUpdateURL, UpdateErrorClassification } from './abstractUpdateService.js';
+import { IDialogMainService } from '../../dialogs/electron-main/dialogMainService.js';
+import { IApplicationStorageMainService } from '../../storage/electron-main/storageMainService.js';
+import { StorageScope, StorageTarget } from '../../storage/common/storage.js';
+import { localize } from '../../../nls.js';
+import { toErrorMessage } from '../../../base/common/errorMessage.js';
+import { massageMessageBoxOptions } from '../../dialogs/common/dialogs.js';
+
+const MOVE_TO_APPLICATIONS_FOLDER_CHOICE_KEY = 'application.moveToApplicationsFolder';
 
 export class DarwinUpdateService extends AbstractUpdateService implements IRelaunchHandler {
 
@@ -34,11 +42,14 @@ export class DarwinUpdateService extends AbstractUpdateService implements IRelau
 		@IEnvironmentMainService environmentMainService: IEnvironmentMainService,
 		@IRequestService requestService: IRequestService,
 		@ILogService logService: ILogService,
-		@IProductService productService: IProductService
+		@IProductService productService: IProductService,
+		@IDialogMainService private readonly dialogMainService: IDialogMainService,
+		@IApplicationStorageMainService private readonly applicationStorageMainService: IApplicationStorageMainService
 	) {
 		super(lifecycleMainService, configurationService, environmentMainService, requestService, logService, productService);
 
 		lifecycleMainService.setRelaunchHandler(this);
+		lifecycleMainService.when(LifecycleMainPhase.Eventually).then(() => this.ensureUpdatePrerequisite());
 	}
 
 	handleRelaunch(options?: IRelaunchOptions): boolean {
@@ -101,6 +112,62 @@ export class DarwinUpdateService extends AbstractUpdateService implements IRelau
 		const url = explicit ? this.url : `${this.url}?bg=true`;
 		electron.autoUpdater.setFeedURL({ url });
 		electron.autoUpdater.checkForUpdates();
+	}
+
+	protected override async ensureUpdatePrerequisite(): Promise<void> {
+		if (!electron.app.isInApplicationsFolder()) {
+			let allowed = this.applicationStorageMainService.getBoolean(`${MOVE_TO_APPLICATIONS_FOLDER_CHOICE_KEY}`, StorageScope.APPLICATION);
+			if (allowed === undefined) {
+				const { response, checkboxChecked } = await this.dialogMainService.showMessageBox({
+					type: 'info',
+					buttons: [
+						localize({ key: 'move', comment: ['&& denotes a mnemonic'] }, "&&Move to Applications folder"),
+						localize({ key: 'cancel', comment: ['&& denotes a mnemonic'] }, "&&Cancel")
+					],
+					message: localize('moveToApplicationsFolderWarning', "Current version of {0} is installed outside the Applications folder, would like to move it ?", this.productService.nameLong),
+					checkboxLabel: localize('remember', "Do not ask again"),
+					cancelId: 1
+				});
+
+				allowed = response === 0;
+				if (allowed && checkboxChecked) {
+					this.applicationStorageMainService.store(`${MOVE_TO_APPLICATIONS_FOLDER_CHOICE_KEY}`, allowed, StorageScope.APPLICATION, StorageTarget.MACHINE);
+				}
+			}
+
+			if (allowed) {
+				try {
+					const result = electron.app.moveToApplicationsFolder({
+						conflictHandler: conflictType => {
+							let message: string, detail: string;
+							if (conflictType === 'exists') {
+								message = localize('applicationAlreadyExists', "A version of {0} already exists inside the Applications folder, would you like to replace it ?", this.productService.nameLong);
+								detail = localize('applicationAlreadyExistsDetail', "Continuing this step would proceed to replace the version inside the Applications folder");
+							} else if (conflictType === 'existsAndRunning') {
+								message = localize('applicationAlreadyExistsAndRunning', "A version of {0} is currently running from the Applications folder, would you like to replace it ?", this.productService.nameLong);
+								detail = localize('applicationAlreadyExistsAndRunningDetail', "Continuing this step would proceed to terminate the running instance and replace the version inside the Applications folder");
+							} else {
+								return false;
+							}
+							const response = electron.dialog.showMessageBoxSync(massageMessageBoxOptions({
+								type: 'warning',
+								buttons: [
+									localize({ key: 'continue', comment: ['&& denotes a mnemonic'] }, "&&Continue"),
+									localize({ key: 'cancel', comment: ['&& denotes a mnemonic'] }, "&&Cancel")
+								],
+								message,
+								detail,
+								cancelId: 1
+							}, this.productService).options);
+							return (response === 0);
+						}
+					});
+					this.logService.trace(`update#moveToApplicationsFolder: ${result ? 'success' : 'failed'}.`);
+				} catch (error) {
+					this.logService.trace(`update#moveToApplicationsFolder: failed with ${toErrorMessage(error)}`);
+				}
+			}
+		}
 	}
 
 	private onUpdateAvailable(): void {

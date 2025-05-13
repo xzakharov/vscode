@@ -230,6 +230,10 @@ export abstract class AbstractUpdateService implements IUpdateService {
 		// noop
 	}
 
+	protected async ensureUpdatePrerequisite(): Promise<void> {
+		// noop
+	}
+
 	protected abstract buildUpdateFeedUrl(quality: string): string | undefined;
 	protected abstract doCheckForUpdates(explicit: boolean): void;
 }
