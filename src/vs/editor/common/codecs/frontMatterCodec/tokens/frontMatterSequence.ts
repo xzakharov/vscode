@@ -6,18 +6,17 @@
 import { BaseToken } from '../../baseToken.js';
 import { FrontMatterValueToken } from './frontMatterToken.js';
 import { Word, SpacingToken } from '../../simpleCodec/tokens/index.js';
-import { type TSimpleDecoderToken } from '../../simpleCodec/simpleDecoder.js';
 
 /**
  * Token represents a generic sequence of tokens in a Front Matter header.
  */
-export class FrontMatterSequence extends FrontMatterValueToken<string, readonly TSimpleDecoderToken[]> {
+export class FrontMatterSequence extends FrontMatterValueToken<FrontMatterSequence> {
 	/**
 	 * @override Because this token represent a generic sequence of tokens,
-	 * the type name is represented by the text of sequence itself.
+	 *           the type name is represented by the sequence of tokens itself
 	 */
-	public override get valueTypeName(): string {
-		return this.text;
+	public override get valueTypeName(): this {
+		return this;
 	}
 
 	/**

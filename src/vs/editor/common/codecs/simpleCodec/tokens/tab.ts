@@ -18,7 +18,7 @@ export class Tab extends SpacingToken<'\t'> {
 	/**
 	 * Return text representation of the token.
 	 */
-	public override get text() {
+	public override get text(): '\t' {
 		return Tab.symbol;
 	}
 

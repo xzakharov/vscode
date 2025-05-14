@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Word } from '../simpleCodec/tokens/index.js';
-import { TokenStream } from '../utils/tokenStream.js';
+import { ObjectStream } from '../utils/objectStream.js';
 import { assert } from '../../../../base/common/assert.js';
 import { VSBuffer } from '../../../../base/common/buffer.js';
 import { VALID_INTER_RECORD_SPACING_TOKENS } from './constants.js';
@@ -30,9 +30,9 @@ export class FrontMatterDecoder extends BaseDecoder<TFrontMatterToken, TSimpleDe
 	private current?: PartialFrontMatterRecordName | PartialFrontMatterRecordNameWithDelimiter | PartialFrontMatterRecord;
 
 	constructor(
-		stream: ReadableStream<VSBuffer> | TokenStream<TSimpleDecoderToken>,
+		stream: ReadableStream<VSBuffer> | ObjectStream<TSimpleDecoderToken>,
 	) {
-		if (stream instanceof TokenStream) {
+		if (stream instanceof ObjectStream) {
 			super(stream);
 
 			return;

@@ -39,14 +39,13 @@ export abstract class PromptStringMetadata extends PromptMetadataRecord {
 	public override validate(): readonly PromptMetadataDiagnostic[] {
 		const { valueToken } = this.recordToken;
 
-		// TODO: @legomushroom - allow for sequence tokens
-
 		// validate that the record value is a string
 		if (valueToken instanceof FrontMatterString) {
 			this.valueToken = valueToken;
 			return this.issues;
 		}
 
+		// TODO: @legomushroom
 		if (valueToken instanceof FrontMatterSequence) {
 			this.valueToken = valueToken;
 			return this.issues;
@@ -60,7 +59,7 @@ export abstract class PromptStringMetadata extends PromptMetadataRecord {
 					"Value of the '{0}' metadata must be '{1}', got '{2}'.",
 					this.recordName,
 					'string',
-					valueToken.valueTypeName,
+					valueToken.valueTypeName.toString(),
 				),
 			),
 		);

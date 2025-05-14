@@ -315,4 +315,12 @@ suite('FrontMatterDecoder', () => {
 			});
 		});
 	});
+
+	test('• empty', async () => {
+		const test = disposables.add(
+			new TestFrontMatterDecoder(),
+		);
+
+		await test.run('', []);
+	});
 });

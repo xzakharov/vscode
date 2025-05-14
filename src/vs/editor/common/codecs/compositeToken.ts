@@ -9,6 +9,7 @@ import { BaseToken } from './baseToken.js';
  * Composite token consists of a list of other tokens.
  */
 export abstract class CompositeToken<TTokens extends readonly BaseToken[]> extends BaseToken {
+	// TODO: @legomushroom - (merge) do we need this field?
 	protected readonly childTokens: [...TTokens];
 
 	constructor(
