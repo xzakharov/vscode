@@ -9,7 +9,7 @@ import { BaseToken } from './baseToken.js';
  * Composite token consists of a list of other tokens.
  */
 export abstract class CompositeToken<TTokens extends readonly BaseToken[]> extends BaseToken {
-	// TODO: @legomushroom - (merge) do we need this field?
+	// TODO: @legomushroom
 	protected readonly childTokens: [...TTokens];
 
 	constructor(
@@ -55,4 +55,28 @@ export abstract class CompositeToken<TTokens extends readonly BaseToken[]> exten
 
 		return true;
 	}
+
+	// /**
+	//  * TODO: @legomushroom
+	//  */
+	// public diff(other: BaseToken): TTree<BaseToken> {
+	// 	// if (super.equals(other) === false) {
+	// 	// 	return false;
+	// 	// }
+
+	// 	// if (this.tokens.length !== other.tokens.length) {
+	// 	// 	return false;
+	// 	// }
+
+	// 	// for (let i = 0; i < this.tokens.length; i++) {
+	// 	// 	const childToken = this.tokens[i];
+	// 	// 	const otherChildToken = other.tokens[i];
+
+	// 	// 	if (childToken.equals(otherChildToken) === false) {
+	// 	// 		return false;
+	// 	// 	}
+	// 	// }
+
+	// 	// return true;
+	// }
 }

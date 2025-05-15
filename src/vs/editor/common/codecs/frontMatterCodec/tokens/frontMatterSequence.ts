@@ -22,6 +22,7 @@ export class FrontMatterSequence extends FrontMatterValueToken<FrontMatterSequen
 	/**
 	 * TODO: @legomushroom
 	 */
+	// TODO: @legomushroom - add a note about the `trimEnd` call
 	// TODO: @legomushroom - trim spaces?
 	public get cleanText(): string {
 		return this.text;
@@ -30,7 +31,8 @@ export class FrontMatterSequence extends FrontMatterValueToken<FrontMatterSequen
 	/**
 	 * TODO: @legomushroom
 	 */
-	// TODO: @legomushroom - unit test
+	// TODO: @legomushroom - cache the result?
+	// TODO: @legomushroom - unit test?
 	public trimEnd(): readonly SpacingToken[] {
 		const trimmedTokens = [];
 
@@ -52,6 +54,7 @@ export class FrontMatterSequence extends FrontMatterValueToken<FrontMatterSequen
 		this.childTokens.length = index + 1;
 		if (this.childTokens.length === 0) {
 			this.collapseRangeToStart();
+			// TODO: @legomushroom - add description
 			this.childTokens.push(
 				new Word(this.range, ''),
 			);
