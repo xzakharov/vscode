@@ -2780,10 +2780,12 @@ export class EditorLayoutInfoComputer extends ComputedEditorOption<EditorOption.
 			decorationsLeft += minimapLayout.minimapWidth;
 			contentLeft += minimapLayout.minimapWidth;
 		}
-		const contentWidth = remainingWidth - minimapLayout.minimapWidth;
+
+		const minimapOffset = minimap.enabled && minimap.side === 'right' ? verticalScrollbarWidth : 0;
+		const contentWidth = remainingWidth - minimapLayout.minimapWidth - minimapOffset;
 
 		// (leaving 2px for the cursor to have space after the last character)
-		const viewportColumn = Math.max(1, Math.floor((contentWidth - verticalScrollbarWidth - 2) / typicalHalfwidthCharacterWidth));
+		const viewportColumn = Math.max(1, Math.floor((contentWidth - 2) / typicalHalfwidthCharacterWidth));
 
 		const verticalArrowSize = (verticalScrollbarHasArrows ? scrollbarArrowSize : 0);
 
