@@ -67,14 +67,14 @@ class Settings {
 		this.themeType = theme.type;
 
 		const minimapOpts = options.get(EditorOption.minimap);
-		const minimapEnabled = minimapOpts.enabled;
 		const minimapSide = minimapOpts.side;
+		const minimapAlwaysVisible = minimapOpts.enabled && !minimapOpts.autohide;
 		const themeColor = theme.getColor(editorOverviewRulerBackground);
 		const defaultBackground = TokenizationRegistry.getDefaultBackground();
 
 		if (themeColor) {
 			this.backgroundColor = themeColor;
-		} else if (minimapEnabled && minimapSide === 'right') {
+		} else if (minimapAlwaysVisible && minimapSide === 'right') {
 			this.backgroundColor = defaultBackground;
 		} else {
 			this.backgroundColor = null;
